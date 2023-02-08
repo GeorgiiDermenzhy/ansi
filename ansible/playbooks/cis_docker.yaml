@@ -1,0 +1,133 @@
+#cis_docker.yaml
+---
+- hosts: servers
+  gather_facts: false
+  tasks:
+    - name: Creating default daemon.json, if doesn't exist
+      become: true
+      copy:
+        src: ../daemon.json
+        dest: /etc/docker/
+        force: false
+
+    # - name: Stop docker services
+    #   become: true
+    #   service: name=docker state=stopped
+
+    - name: Stop docker services
+      become: true
+      service: name=docker.service state=stopped
+
+    - name: Stop docker socket
+      become: true
+      service: name=docker.socket state=stopped
+
+    - name: 2.2 Ensure network traffic is restricted between containers on the default bridge
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/docker/daemon.json
+        regexp: '^\s"icc'
+        line: ' "icc": false,'
+        backrefs: yes
+
+    - name: 2.3 Ensure the logging level is set to 'info'
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/docker/daemon.json
+        regexp: '^\s"log-level'
+        line: ' "log-level": "info",'
+        backrefs: yes
+
+    - name: 2.4 Ensure Docker is allowed to make changes to iptables
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/docker/daemon.json
+        regexp: '^\s"iptables'
+        line: ' "iptables": false,'
+        backrefs: yes
+
+    # - name: 2.5 Ensure insecure registries are not used
+    #   become: true
+    #   ansible.builtin.lineinfile:
+    #     path: /etc/docker/daemon.json
+    #     regexp: '^\s"insecure-registries'
+    #     line: ' "insecure-registries": [],'
+    #     backrefs: yes
+
+    - name: 2.6 Ensure aufs storage driver is not used
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/docker/daemon.json
+        regexp: '^\s"storage-driver'
+        line: ' "storage-driver": "devicemapper",'
+        backrefs: yes
+
+    # - name: 2.9 Enable user namespace support
+    #   become: true
+    #   ansible.builtin.lineinfile:
+    #     path: /etc/docker/daemon.json
+    #     regexp: '^\s"userns-remap'
+    #     line: ' "userns-remap": "default",'
+    #     backrefs: yes
+
+    - name: 2.10 Ensure the default cgroup usage has been confirmed
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/docker/daemon.json
+        regexp: '^\s"cgroup-parent'
+        line: ' "cgroup-parent": "docker",'
+        backrefs: yes
+
+    - name: 2.11 Ensure base device size is not changed until needed
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/docker/daemon.json
+        regexp: '^\s"storage-opts'
+        line: ' "storage-opts": ["dm.basesize=10G"],'
+        backrefs: yes
+
+    - name: 2.14 Ensure containers are restricted from acquiring new
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/docker/daemon.json
+        regexp: '^\s"no-new-privileges'
+        line: ' "no-new-privileges": true,'
+        backrefs: yes
+
+    - name: 2.15 Ensure live restore is enabled
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/docker/daemon.json
+        regexp: '^\s"live-restore'
+        line: ' "live-restore": true,'
+        backrefs: yes
+
+    - name: 2.16 Ensure Userland Proxy is Disabled
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/docker/daemon.json
+        regexp: '^\s"userland-proxy'
+        line: ' "userland-proxy": false,'
+        backrefs: yes
+
+    - name: 2.18 Ensure that experimental features are not implemented in production
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/docker/daemon.json
+        regexp: '^\s"experimental'
+        line: ' "experimental": false'
+        backrefs: yes
+
+    # - name: Start docker socket
+    #   become: true
+    #   service: name=docker state=started
+
+    - name: Start docker services
+      become: true
+      service: name=docker.service state=started
+
+    - name: Start docker socket
+      become: true
+      service: name=docker.socket state=started
+
+    

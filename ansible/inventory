@@ -1,0 +1,8 @@
+# hosts-dev
+
+[servers]
+jenkins ansible_host=10.0.0.9
+
+[local]
+#below setup is to prevent ansible from SSH to the localhost
+control ansible_connection=local

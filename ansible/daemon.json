@@ -1,0 +1,14 @@
+{
+ "icc": true,
+ "log-level": "",
+ "iptables": true,
+ "insecure-registries": [],
+ "storage-driver": "overlay2",
+ "userns-remap": "default",
+ "cgroup-parent": "docker",
+ "storage-opts": ["dm.basesize=10G"],
+ "no-new-privileges": false,
+ "live-restore": true,
+ "userland-proxy": false,
+ "experimental": false
+}
